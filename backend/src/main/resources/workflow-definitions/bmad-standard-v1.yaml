@@ -1,0 +1,69 @@
+id: bmad-standard
+version: 1.0.0
+name: BMAD Standard with UX approval
+phases:
+  - id: analysis
+    steps:
+      - id: project-brief
+        kind: AGENT
+        agent: analyst
+        produces: PROJECT_BRIEF
+  - id: planning
+    steps:
+      - id: create-prd
+        kind: AGENT
+        agent: product-manager
+        produces: PRD
+        requires: project-brief
+      - id: create-ux-mockups
+        kind: AGENT
+        agent: ux-designer
+        produces: UX_MOCKUP_SET
+        maxProposals: 3
+        requires: create-prd
+      - id: approve-ux
+        kind: APPROVAL
+        approvalType: UX_DESIGN
+        artifact: UX_MOCKUP_SET
+        requires: create-ux-mockups
+        onReject: create-ux-mockups
+      - id: approve-prd
+        kind: APPROVAL
+        approvalType: FUNCTIONAL
+        artifact: PRD
+        requires: approve-ux
+        onReject: create-prd
+  - id: solutioning
+    steps:
+      - id: design-architecture
+        kind: AGENT
+        agent: architect
+        produces: ARCHITECTURE
+        requires: approve-prd
+      - id: approve-architecture
+        kind: APPROVAL
+        approvalType: TECHNICAL
+        artifact: ARCHITECTURE
+        requires: design-architecture
+        onReject: design-architecture
+      - id: create-stories
+        kind: AGENT
+        agent: scrum-master
+        produces: EPICS_AND_STORIES
+        requires: approve-architecture
+      - id: check-readiness
+        kind: AGENT
+        agent: reviewer
+        produces: READINESS_REPORT
+        requires: create-stories
+      - id: approve-readiness
+        kind: APPROVAL
+        approvalType: READINESS
+        artifact: READINESS_REPORT
+        requires: check-readiness
+        onReject: create-stories
+  - id: implementation
+    steps:
+      - id: implementation-handoff
+        kind: HANDOFF
+        requires: approve-readiness

@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: agent-workspace
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/agent_workspace}
+    #username: ${DB_USER:agent_workspace}
+		#password: ${DB_PASSWORD}
+		username: postgres
+		password: postgres
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: agent_workspace
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+app:
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-4.1-mini}
+    price-input-usd-per-million: ${OPENAI_PRICE_INPUT_USD_PER_MILLION:0}
+    price-output-usd-per-million: ${OPENAI_PRICE_OUTPUT_USD_PER_MILLION:0}
+  bootstrap-admin:
+    username: ${APP_BOOTSTRAP_ADMIN_USERNAME:}
+    password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        name: AWSESSION
+        http-only: true
+        secure: true
+        same-site: lax
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
